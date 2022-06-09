@@ -2,14 +2,16 @@
 #include <WiFi.h>
 //#include <HTTPClient.h>
 #include "ESPAsyncWebServer.h"
+#include "DHT.h"
 
-const char* ssid = "Exception_2G";
+
+//const char* ssid = "Exception_2G";
 //const char* ssid = "SALA-602";// nombre de la red
-//const char* ssid = "fino";
+const char* ssid = "fino";
 //const char* ssid = "SETREM-LAB01";
 
-//const char* password = "finodofino";
-const char* password = "exc4pt1oN";
+const char* password = "finodofino";
+//const char* password = "exc4pt1oN";
 
 const int luz_azul = 15;
 const int luz_branca = 4;
@@ -18,40 +20,24 @@ const int luz_vermelha = 13;
 const int redPin = 17;
 const int greenPin = 27;
 const int bluePin = 18;
+//temperatura
+#define DHT11PIN 26
+DHT dht(DHT11PIN, DHT11);
 
- 
-//WebServer server(80);  // puerto por defecto 80
+String resposta;
+
 AsyncWebServer server(80);
 
-void setColor(int red, int green, int blue)
-  {
-    #ifdef COMMON_ANODE
-      red = 255 - red;
-      green = 255 - green;
-      blue = 255 - blue;
-    #endif
-    analogWrite(redPin, red);
-    analogWrite(greenPin, green);
-    analogWrite(bluePin, blue);  
-  }
-  /*void ligarColors(){
-    setColor(255, 255, 255);
-    delay(1000);
-    setColor(80, 0, 80);  // purple
-    delay(1000);
-    setColor(255, 0, 0);  // red
-    delay(1000);
-    setColor(0, 255, 0);  // green
-    delay(1000);
-    setColor(0, 0, 255);  // blue
-    delay(1000);
-    setColor(255, 255, 0);  // yellow
-    delay(1000);  
-    
-      // aqua
-    
-  }*/
-
+void setColor(int red, int green, int blue){
+  #ifdef COMMON_ANODE
+    red = 255 - red;
+    green = 255 - green;
+    blue = 255 - blue;
+  #endif
+  analogWrite(redPin, red);
+  analogWrite(greenPin, green);
+  analogWrite(bluePin, blue);  
+}
 
 void setup() {
   pinMode(luz_azul, OUTPUT);
@@ -81,7 +67,8 @@ void setup() {
     Serial.println("acao: ");
     Serial.println(acao_arduino);
     
-    String resposta = String("{\"nome\":\""+acao_arduino+"\"}");
+    resposta = String("{\"nome\":\""+acao_arduino+"\"}");
+    
     if(acao_arduino == "luz_azul"){
       digitalWrite(luz_azul, HIGH);
     }
@@ -103,13 +90,18 @@ void setup() {
     if(acao_arduino == "led_rgb"){
       setColor(255, 255, 0);
     }
+    if(acao_arduino == "temperatura"){
+      float temperatura = dht.readTemperature();
+      String temperaturaTexto = String(temperatura);
+      resposta = String("{\"nome\":\""+temperaturaTexto+"\"}");
+    }
+    
     request->send(200, "application/json", resposta);
     
   });
 
   server.begin();
-  
-
+  dht.begin();
 }
  
 void loop() {
