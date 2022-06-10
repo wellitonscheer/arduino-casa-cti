@@ -87,9 +87,26 @@ void setup() {
     if(acao_arduino == "desliga_luz_vermelha"){
       digitalWrite(luz_vermelha, LOW);
     }
+    
     if(acao_arduino == "led_rgb"){
-      setColor(255, 255, 0);
+      /*analogWrite(redPin, red);
+      analogWrite(greenPin, green);
+      analogWrite(bluePin, blue);*/
+      int cores[4];
+      for(int i = 0; i < 3; i++){
+        int paramAposAcao = i+1;
+        AsyncWebParameter* p = request->getParam(paramAposAcao);
+        String valorCorTexto = p->value();
+        int valorCor = valorCorTexto.toInt();
+        cores[i] = valorCor;
+        Serial.println(valorCor);
+      }
+      Serial.println(cores[0]);
+      Serial.println(cores[1]);
+      Serial.println(cores[2]);
+      setColor(cores[0], cores[1], cores[2]);
     }
+    
     if(acao_arduino == "temperatura"){
       float temperatura = dht.readTemperature();
       String temperaturaTexto = String(temperatura);
