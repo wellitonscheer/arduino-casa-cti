@@ -9,6 +9,7 @@
 //const char* ssid = "SALA-602";// nombre de la red
 const char* ssid = "fino";
 //const char* ssid = "SETREM-LAB01";
+//const char* ssid = "RESTAURANTE";
 
 const char* password = "finodofino";
 //const char* password = "exc4pt1oN";
@@ -89,12 +90,9 @@ void setup() {
     }
     
     if(acao_arduino == "led_rgb"){
-      /*analogWrite(redPin, red);
-      analogWrite(greenPin, green);
-      analogWrite(bluePin, blue);*/
       int cores[4];
       for(int i = 0; i < 3; i++){
-        int paramAposAcao = i+1;
+        int paramAposAcao = i++;
         AsyncWebParameter* p = request->getParam(paramAposAcao);
         String valorCorTexto = p->value();
         int valorCor = valorCorTexto.toInt();
@@ -111,6 +109,10 @@ void setup() {
       float temperatura = dht.readTemperature();
       String temperaturaTexto = String(temperatura);
       resposta = String("{\"nome\":\""+temperaturaTexto+"\"}");
+    }
+    if(acao_arduino == "teste")
+    {
+        resposta = String("{\"nome\":\"""chegou no teste""\"}");
     }
     
     request->send(200, "application/json", resposta);
