@@ -90,19 +90,22 @@ void setup() {
     }
     
     if(acao_arduino == "led_rgb"){
-      int cores[4];
-      for(int i = 0; i < 3; i++){
-        int paramAposAcao = i++;
-        AsyncWebParameter* p = request->getParam(paramAposAcao);
-        String valorCorTexto = p->value();
-        int valorCor = valorCorTexto.toInt();
-        cores[i] = valorCor;
-        Serial.println(valorCor);
-      }
-      Serial.println(cores[0]);
-      Serial.println(cores[1]);
-      Serial.println(cores[2]);
-      setColor(cores[0], cores[1], cores[2]);
+      AsyncWebParameter* requisicaoRed = request->getParam(1);
+      String redTexto = requisicaoRed->value();
+      int redValor = redTexto.toInt();
+      
+      AsyncWebParameter* requisicaoGreen = request->getParam(2);
+      String greenTexto = requisicaoGreen->value();
+      int greenValor = greenTexto.toInt();
+      
+      AsyncWebParameter* requisicaoBlue = request->getParam(3);
+      String blueTexto = requisicaoBlue->value();
+      int blueValor = blueTexto.toInt();
+      
+      Serial.println(redValor);
+      Serial.println(greenValor);
+      Serial.println(blueValor);
+      setColor(redValor, greenValor, blueValor);
     }
     
     if(acao_arduino == "temperatura"){
