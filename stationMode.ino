@@ -3,6 +3,7 @@
 //#include <HTTPClient.h>
 #include "ESPAsyncWebServer.h"
 #include "DHT.h"
+//#include "pitches.h"
 
 
 //const char* ssid = "Exception_2G";
@@ -21,6 +22,16 @@ const int luz_vermelha = 13;
 const int redPin = 17;
 const int greenPin = 27;
 const int bluePin = 18;
+
+const int presenca = 34;
+
+const int luminosidade = 35;
+const int ledLuminosidade = 21;
+
+int acionamento;
+const int alarme = 19;
+unsigned int frequencia;
+
 //temperatura
 #define DHT11PIN 26
 DHT dht(DHT11PIN, DHT11);
@@ -28,6 +39,28 @@ DHT dht(DHT11PIN, DHT11);
 String resposta;
 
 AsyncWebServer server(80);
+
+void ligarAlarme(){
+  if(digitalRead(presenca) == HIGH) {
+      digitalWrite(alarme, HIGH);
+       delay(2000);
+  }    
+  else{
+      digitalWrite(alarme, LOW); 
+  }
+}
+
+void ligarLedLuminosidade(){
+  int valorLuminosidade = analogRead(luminosidade);
+  //Serial.println(valorLuminosidade);
+  if(valorLuminosidade < 50){
+    digitalWrite(ledLuminosidade, HIGH);
+    
+  }
+  else{
+    digitalWrite(ledLuminosidade, LOW);
+  }
+}
 
 void setColor(int red, int green, int blue){
   #ifdef COMMON_ANODE
@@ -44,6 +77,12 @@ void setup() {
   pinMode(luz_azul, OUTPUT);
   pinMode(luz_branca, OUTPUT);
   pinMode(luz_vermelha, OUTPUT);
+  pinMode(presenca, INPUT);
+  pinMode(alarme, OUTPUT);
+  pinMode(luminosidade, INPUT);
+  pinMode(ledLuminosidade, OUTPUT);
+  //ledcAttachPin(alarme, 0);
+  //ledcSetup(0, 2000, 1);
   Serial.begin(115200);
 
   //WiFi.begin(ssid);
@@ -127,5 +166,6 @@ void setup() {
 }
  
 void loop() {
-  
+  ligarAlarme();
+  ligarLedLuminosidade();
 }
