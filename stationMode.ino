@@ -1,10 +1,24 @@
 //#include <WebServer.h>
 #include <WiFi.h>
 //#include <HTTPClient.h>
-#include "ESPAsyncWebServer.h"
-#include "DHT.h"
-//#include "pitches.h"
+#include <ESPAsyncWebServer.h>
 
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+
+//#include "pitches.h"  
+
+#define DHTPIN 26 
+
+#define DHTTYPE    DHT11 
+
+DHT_Unified dht(DHTPIN, DHTTYPE);
+
+float temperatura;
+float umidade;
+
+//DHT dht(26, DHT11);
 
 //const char* ssid = "Exception_2G";
 //const char* ssid = "SALA-602";// nombre de la red
@@ -33,8 +47,8 @@ const int alarme = 19;
 unsigned int frequencia;
 
 //temperatura
-#define DHT11PIN 26
-DHT dht(DHT11PIN, DHT11);
+//#define DHT11PIN 26
+//DHT dht(DHT11PIN, DHT11);
 
 String resposta;
 
@@ -73,7 +87,31 @@ void setColor(int red, int green, int blue){
   analogWrite(bluePin, blue);  
 }
 
+void pegaTempUmid(){
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+  if (isnan(event.temperature)) {
+    Serial.println(F("Error reading temperature!"));
+  }
+  else {
+    Serial.print(F("Temperature: "));
+    Serial.print(event.temperature);
+    Serial.println(F("°C"));
+  }
+  // Get humidity event and print its value.
+  dht.humidity().getEvent(&event);
+  if (isnan(event.relative_humidity)) {
+    Serial.println(F("Error reading humidity!"));
+  }
+  else {
+    Serial.print(F("Humidity: "));
+    Serial.print(event.relative_humidity);
+    Serial.println(F("%"));
+  }
+}
 void setup() {
+  dht.begin();
+  Serial.begin(115200);
   pinMode(luz_azul, OUTPUT);
   pinMode(luz_branca, OUTPUT);
   pinMode(luz_vermelha, OUTPUT);
@@ -83,7 +121,7 @@ void setup() {
   pinMode(ledLuminosidade, OUTPUT);
   //ledcAttachPin(alarme, 0);
   //ledcSetup(0, 2000, 1);
-  Serial.begin(115200);
+  
 
   //WiFi.begin(ssid);
   WiFi.begin(ssid, password);
@@ -148,9 +186,8 @@ void setup() {
     }
     
     if(acao_arduino == "temperatura"){
-      float temperatura = dht.readTemperature();
-      String temperaturaTexto = String(temperatura);
-      resposta = String("{\"nome\":\""+temperaturaTexto+"\"}");
+      //pegaTempUmid();
+      resposta = String("{\"nome\":\""+String(temperatura)+"\"}");
     }
     if(acao_arduino == "teste")
     {
@@ -162,10 +199,34 @@ void setup() {
   });
 
   server.begin();
-  dht.begin();
 }
  
 void loop() {
   ligarAlarme();
   ligarLedLuminosidade();
+
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+  if (isnan(event.temperature)) {
+    Serial.println(F("Error reading temperature!"));
+  }
+  else {
+    Serial.print(F("Temperature: "));
+    //Serial.print(event.temperature);
+    temperatura = event.temperature;
+    Serial.print(temperatura);
+    Serial.println(F("°C"));
+  }
+  // Get humidity event and print its value.
+  dht.humidity().getEvent(&event);
+  if (isnan(event.relative_humidity)) {
+    Serial.println(F("Error reading humidity!"));
+  }
+  else {
+    Serial.print(F("Humidity: "));
+    //Serial.print(event.relative_humidity);
+    umidade = event.relative_humidity;
+    Serial.print(umidade);
+    Serial.println(F("%"));
+  }
 }
