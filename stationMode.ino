@@ -91,22 +91,26 @@ void pegaTempUmid(){
   sensors_event_t event;
   dht.temperature().getEvent(&event);
   if (isnan(event.temperature)) {
-    Serial.println(F("Error reading temperature!"));
+    //Serial.println(F("Error reading temperature!"));
   }
   else {
-    Serial.print(F("Temperature: "));
-    Serial.print(event.temperature);
-    Serial.println(F("°C"));
+    //Serial.print(F("Temperature: "));
+    //Serial.print(event.temperature);
+    temperatura = event.temperature;
+    //Serial.print(temperatura);
+    //Serial.println(F("°C"));
   }
   // Get humidity event and print its value.
   dht.humidity().getEvent(&event);
   if (isnan(event.relative_humidity)) {
-    Serial.println(F("Error reading humidity!"));
+    //Serial.println(F("Error reading humidity!"));
   }
   else {
-    Serial.print(F("Humidity: "));
-    Serial.print(event.relative_humidity);
-    Serial.println(F("%"));
+    //Serial.print(F("Humidity: "));
+    //Serial.print(event.relative_humidity);
+    umidade = event.relative_humidity;
+    //Serial.print(umidade);
+    //Serial.println(F("%"));
   }
 }
 void setup() {
@@ -186,8 +190,7 @@ void setup() {
     }
     
     if(acao_arduino == "temperatura"){
-      //pegaTempUmid();
-      resposta = String("{\"nome\":\""+String(temperatura)+"\"}");
+      resposta = String("{\"nome\":\""+String(temperatura)+"\",\"umidade\":\""+String(umidade)+"\"}");
     }
     if(acao_arduino == "teste")
     {
@@ -204,29 +207,6 @@ void setup() {
 void loop() {
   ligarAlarme();
   ligarLedLuminosidade();
-
-  sensors_event_t event;
-  dht.temperature().getEvent(&event);
-  if (isnan(event.temperature)) {
-    Serial.println(F("Error reading temperature!"));
-  }
-  else {
-    Serial.print(F("Temperature: "));
-    //Serial.print(event.temperature);
-    temperatura = event.temperature;
-    Serial.print(temperatura);
-    Serial.println(F("°C"));
-  }
-  // Get humidity event and print its value.
-  dht.humidity().getEvent(&event);
-  if (isnan(event.relative_humidity)) {
-    Serial.println(F("Error reading humidity!"));
-  }
-  else {
-    Serial.print(F("Humidity: "));
-    //Serial.print(event.relative_humidity);
-    umidade = event.relative_humidity;
-    Serial.print(umidade);
-    Serial.println(F("%"));
-  }
+  //delay(1000);
+  pegaTempUmid();
 }
